@@ -1,36 +1,54 @@
-import { useEffect } from 'react';
-import { useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet.heat';
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
+import L from "leaflet";
 
-function HeatmapLayer({ points }) {
+// IMPORTANT – this must load before using it:
+import "leaflet-webgl-heatmap";
+
+export default function HeatmapLayer({ points }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!points || points.length === 0) return;
+    if (!map) return;
+
+    // Check if plugin loaded
+    if (typeof L.webGLHeatmap !== "function") {
+      console.error("webGLHeatmap plugin not loaded!");
+      return;
+    }
+
+    if (!points || points.length === 0) {
+      console.warn("Heatmap: no points provided");
+      return;
+    }
+
+    // Convert the points into WebGLHeatmap format:
+    const heatData = points.map(([lat, lng, intensity]) => ({
+      lat,
+      lng,
+      intensity: Math.min(1, Math.max(0, intensity)),
+    }));
+
+    // Debug (helps check they're correct)
+    console.log("Heatmap data:", heatData);
 
     // Create heatmap layer
-    const heat = L.heatLayer(points, {
-      radius: 80,
-      blur: 40,
-      max: 0.8,
-      minOpacity: 0.5,
-      gradient: {
-        0.0: '#00ff00',  // green (clean)
-        0.3: '#ffff00',  // yellow (low)
-        0.5: '#ffa500',  // orange (medium)
-        0.7: '#ff4500',  // orange-red (high)
-        1.0: '#ff0000'   // red (very high)
-      }
-    }).addTo(map);
+    const heatmap = L.webGLHeatmap({
+      size: 40,                 // constant size (zoom-stable)
+      units: "px",
+      opacity: 1.0,
+      alphaRange: [0.0, 1.0],
+      intensityToAlpha: true,
+      gradientTexture: false,
+    });
 
-    // Cleanup on unmount
+    heatmap.setData(heatData);
+    heatmap.addTo(map);
+
     return () => {
-      map.removeLayer(heat);
+      map.removeLayer(heatmap);
     };
   }, [map, points]);
 
   return null;
 }
-
-export default HeatmapLayer;
