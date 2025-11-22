@@ -1,12 +1,12 @@
 import { robotsStore } from './robotsStore';
 
-// Mock trash hotspots around the Isar
+// Mock trash hotspots around the new location (48.109593, 11.559542)
 export const trashHotspots = [
-  { id: 1, position: [48.12520, 11.58350], radius: 30 },
-  { id: 2, position: [48.12590, 11.58420], radius: 25 },
-  { id: 3, position: [48.12480, 11.58450], radius: 35 },
-  { id: 4, position: [48.12610, 11.58320], radius: 28 },
-  { id: 5, position: [48.12550, 11.58480], radius: 32 },
+  { id: 1, position: [48.109593, 11.559542], radius: 30 },
+  { id: 2, position: [48.109800, 11.559800], radius: 25 },
+  { id: 3, position: [48.109400, 11.559200], radius: 35 },
+  { id: 4, position: [48.109700, 11.559300], radius: 28 },
+  { id: 5, position: [48.109300, 11.559700], radius: 32 },
 ];
 
 // Calculate distance between two lat/lng points (simplified)
@@ -70,12 +70,13 @@ export function simulateRobotMovement() {
           targetHotspotIndex: nextIndex,
           status: newStatus,
           battery: Math.max(10, robot.battery - 0.3),
+          trashCollected: robot.trashCollected + (Math.random() * 0.5),
         },
       });
     } else {
       // Move toward target
-      const newPosition = moveToward(robot.position, targetPosition, 0.00015);
-      const newBattery = Math.max(10, robot.battery - 0.1);
+      const newPosition = moveToward(robot.position, targetPosition, 0.00005); // Slower movement
+      const newBattery = Math.max(10, robot.battery - 0.05);
       
       // Occasionally change status
       let newStatus = robot.status;

@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.css";
+import { robotsStore } from "./robotsStore";
+import { startSimulation, stopSimulation } from "./robotSimulation";
 
 export default function MapView() {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+  const robotMarkersRef = useRef({}); // Store robot markers by ID
   const [heatmapOpacity, setHeatmapOpacity] = useState(0.5);
   const [trashData, setTrashData] = useState([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [robots, setRobots] = useState(robotsStore.getRobots());
 
   // Load CSV data
   useEffect(() => {
@@ -96,6 +100,46 @@ export default function MapView() {
             type: "Feature",
             geometry: { type: "Point", coordinates: [11.58440, 48.1241] },
             properties: { intensity: 0.7 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559620, 48.110591] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559610, 48.110691] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559603, 48.110791] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559594, 48.110891] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559620, 48.110991] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559920, 48.110091] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559620, 48.109091] },
+            properties: { intensity: 0.8 },
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.559620, 48.109891] },
+            properties: { intensity: 0.8 },
           }
         ],
       };
@@ -205,6 +249,115 @@ export default function MapView() {
     });
   }, [trashData, mapLoaded]);
 
+  // Robot simulation effect
+  useEffect(() => {
+    startSimulation();
+    const unsubscribe = robotsStore.subscribe((updatedRobots) => {
+      setRobots([...updatedRobots]);
+    });
+    return () => {
+      stopSimulation();
+      unsubscribe();
+    };
+  }, []);
+
+  // Update robot markers on map
+  useEffect(() => {
+    if (!mapRef.current || !mapLoaded) return;
+
+    const map = mapRef.current;
+
+    robots.forEach((robot) => {
+      let marker = robotMarkersRef.current[robot.id];
+
+      if (!marker) {
+        // Create new marker
+        const el = document.createElement("div");
+        el.className = "robot-marker-container";
+        
+        const inner = document.createElement("div");
+        inner.className = "robot-marker-content";
+        inner.innerHTML = `<img src="/logo.png" alt="Robot" style="width: 100%; height: 100%; object-fit: contain;" />`;
+        el.appendChild(inner);
+
+        const popupContent = `
+          <div class="popup-card">
+            <div class="popup-heading">
+              <span class="popup-emoji">
+                <img src="/logo.png" alt="Robot" style="width: 30px; height: 30px; object-fit: contain;" />
+              </span>
+              <div>
+                <p class="popup-title">${robot.name}</p>
+                <p class="popup-subtitle">ID ${robot.id} · Status: ${robot.status}</p>
+              </div>
+            </div>
+
+            <div class="popup-stats">
+              <div class="popup-stat-row">
+                <span class="popup-stat-label">Battery</span>
+                <div class="battery-bar-container">
+                  <div class="battery-bar" style="width: ${robot.battery}%"></div>
+                </div>
+                <span class="popup-stat-value">${Math.round(robot.battery)}%</span>
+              </div>
+              <div class="popup-stat-row">
+                <span class="popup-stat-label">Trash collected</span>
+                <span class="popup-stat-value">${robot.trashCollected.toFixed(1)} kg</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const popup = new maplibregl.Popup({ 
+          offset: 16,
+          closeButton: false 
+        }).setHTML(popupContent);
+
+        marker = new maplibregl.Marker({ element: el })
+          .setLngLat([robot.position[1], robot.position[0]]) // Store is [Lat, Lng], MapLibre needs [Lng, Lat]
+          .setPopup(popup)
+          .addTo(map);
+
+        robotMarkersRef.current[robot.id] = marker;
+      } else {
+        // Update existing marker position
+        marker.setLngLat([robot.position[1], robot.position[0]]);
+        
+        // Update popup content if open (optional, but good for live updates)
+        if (marker.getPopup().isOpen()) {
+           const popupContent = `
+          <div class="popup-card">
+            <div class="popup-heading">
+              <span class="popup-emoji">
+                <img src="/logo.png" alt="Robot" style="width: 30px; height: 30px; object-fit: contain;" />
+              </span>
+              <div>
+                <p class="popup-title">${robot.name}</p>
+                <p class="popup-subtitle">ID ${robot.id} · Status: ${robot.status}</p>
+              </div>
+            </div>
+
+            <div class="popup-stats">
+              <div class="popup-stat-row">
+                <span class="popup-stat-label">Battery</span>
+                <div class="battery-bar-container">
+                  <div class="battery-bar" style="width: ${robot.battery}%"></div>
+                </div>
+                <span class="popup-stat-value">${Math.round(robot.battery)}%</span>
+              </div>
+              <div class="popup-stat-row">
+                <span class="popup-stat-label">Trash collected</span>
+                <span class="popup-stat-value">${robot.trashCollected.toFixed(1)} kg</span>
+              </div>
+            </div>
+          </div>
+        `;
+          marker.getPopup().setHTML(popupContent);
+        }
+      }
+    });
+  }, [robots, mapLoaded]);
+
   // Remove markers on unmount
   useEffect(() => {
     return () => {
@@ -221,11 +374,11 @@ export default function MapView() {
       <div className="map-control-card">
         <div className="opacity-card__header">
           <label htmlFor="heatmap-opacity-slider" className="opacity-card__label">
-            Heatmap Transparenz
+            Heatmap Opacity
           </label>
           <span className="opacity-card__value">{Math.round(heatmapOpacity * 100)}%</span>
         </div>
-        <p className="opacity-card__hint">Blende die Heatmap stufenlos ein oder aus.</p>
+        <p className="opacity-card__hint">Fade the heatmap in or out smoothly.</p>
         <input
           id="heatmap-opacity-slider"
           className="opacity-card__slider"

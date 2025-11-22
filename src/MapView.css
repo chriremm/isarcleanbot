@@ -246,6 +246,85 @@
   z-index: -1;
 }
 
+/* Robot Marker Styling */
+.robot-marker-container {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10; /* Above trash markers */
+}
+
+.robot-marker-content {
+  line-height: 1;
+  filter: drop-shadow(0 10px 25px rgba(15, 23, 42, 0.35));
+  transition: transform 0.2s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 8px; /* Add some padding for the image */
+  box-sizing: border-box;
+}
+
+.robot-marker-container:hover .robot-marker-content {
+  transform: scale(1.1);
+  border-color: #38bdf8;
+}
+
+/* Popup Stats Styling */
+.popup-stats {
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popup-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.popup-stat-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.popup-stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.battery-bar-container {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.battery-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
 @keyframes markerPulse {
   0% {
     transform: translate(-50%, -50%) scale(0.4);
