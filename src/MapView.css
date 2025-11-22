@@ -204,8 +204,7 @@
 }
 
 .maplibregl-popup-close-button {
-  color: #0f172a;
-  font-size: 18px;
+  display: none !important;
 }
 
 .trash-marker-container {

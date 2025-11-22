@@ -191,7 +191,10 @@ export default function MapView() {
         </div>
       `;
 
-      const popup = new maplibregl.Popup({ offset: 16 }).setHTML(popupContent);
+      const popup = new maplibregl.Popup({ 
+        offset: 16,
+        closeButton: false 
+      }).setHTML(popupContent);
 
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat([item.longitude, item.latitude])
