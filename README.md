@@ -1,16 +1,61 @@
-# React + Vite
+# Isar CleanBot 🤖♻️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive dashboard simulating autonomous trash-collecting robots along the Isar river in Munich.
 
-Currently, two official plugins are available:
+This project visualizes public trash cans and simulates a fleet of "Isar-Doggo" robots that autonomously visit hotspots to keep the environment clean.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌟 Features
 
-## React Compiler
+*   **Robot Simulation**:
+    *   Real-time tracking of autonomous cleaning robots.
+    *   Simulation of movement, trash collection, and battery consumption.
+    *   Live status display (battery, collected trash, status) by clicking on a robot.
+*   **Interactive Map**:
+    *   Detailed map based on MapLibre GL JS.
+    *   Display of all public trash cans along the Isar (Data source: Open Data Munich).
+*   **Heatmap Visualization**:
+    *   Visualization of trash hotspots.
+    *   Continuously adjustable heatmap opacity via a slider.
+*   **Modern UI**:
+    *   Glassmorphism design for controls and popups.
+    *   Animated markers and smooth transitions.
+*   **AI Trash Detection (Experimental)**:
+    *   Python module for identifying trash in images using the SAM3 model.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Technologies
 
-## Expanding the ESLint configuration
+*   **Frontend**: React, Vite
+*   **Mapping**: MapLibre GL JS
+*   **Styling**: CSS3 (Custom Animations, Glassmorphism)
+*   **Data**: CSV Parsing for trash can locations
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Installation & Start
+
+1.  Clone repository:
+    ```bash
+    git clone https://github.com/chriremm/isarcleanbot.git
+    cd isar-cleanbot
+    ```
+
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+
+3.  Start development server:
+    ```bash
+    npm run dev
+    ```
+
+4.  Open `http://localhost:5173` in your browser.
+
+## 📂 Project Structure
+
+*   `src/MapView.jsx`: Main component for map and rendering.
+*   `src/robotSimulation.js`: Logic for autonomous robot movement.
+*   `src/robotsStore.js`: State management for the robot fleet.
+*   `prediction/`: Python scripts for AI-based trash detection (SAM3).
+*   `public/`: Static assets (CSV data, images).
+
+---
+*Developed as a prototype for a clean Isar.*
